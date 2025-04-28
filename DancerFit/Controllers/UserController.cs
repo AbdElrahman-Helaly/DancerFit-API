@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using DancerFit.DTOS;
 using DancerFit.Models;
+using DancerFit.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -11,34 +12,65 @@ namespace DancerFit.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-       private readonly UserManager<AppDbcontext> _userManager;
-        private readonly IMapper mapper;
-        public UserController(UserManager<AppDbcontext> userManager,IMapper _mapper)
+        private readonly IUserServices userServices;
+      
+        public UserController(IUserServices _userServices)
         {
-           userManager= _userManager;
-            mapper = _mapper;
+          userServices = _userServices;
         }
-   
-        [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] UserRegisterDto dto)
+        [HttpGet]
+        [Route("GetUserById/{id}")]
+        public async Task<IActionResult> GetUserById(string id)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var userExists = await _userManager.FindByEmailAsync(dto.Email);
-            if (userExists != null)
-                return BadRequest(new {Message ="Email Used Before Not Valid"});
-
-            var user = mapper.Map<ApplicationUser>(dto);
-            var result = await _userManager.CreateAsync(userExists,dto.Password);
-
-            if (!result.Succeeded)
-                return BadRequest(result.Errors);
-
-                return Ok(new { Message = "User registered successfully" });
+            if (string.IsNullOrEmpty(id))
+            {
+                return BadRequest("Invalid user ID");
             }
 
-      
-    
+            var user = await userServices.GetUserByIdAsync(id);
+            if (user == null)
+            {
+                return NotFound("User not found");
+            }
+
+            return Ok(user);
+        }
+
+        [HttpPost("Login")]
+        public async Task<IActionResult> Login([FromBody] UserLoginDto loginDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var token = await userServices.LoginAsync(loginDto);
+            if (string.IsNullOrEmpty(token))
+            {
+                return Unauthorized("Invalid login attempt");
+            }
+
+            return Ok(new { Token = token });
+        }
+
+        [HttpPost("Register")]
+        public async Task<IActionResult> Register([FromBody] UserRegisterDto registerDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var result = await userServices.RegisterAsync(registerDto);
+        
+
+
+            return Ok("User registered successfully");
+        }
+       
+   
+        
+
+
     }
 }
