@@ -13,19 +13,22 @@ namespace DancerFit.Services
         private readonly UserManager<ApplicationUser> userManager;
         private readonly RoleManager<IdentityRole> roleManager;
         private readonly IConfiguration configuration;
-        private readonly TrainerServices trainerServices;
-        private readonly DancerServices dancerServices;
-        private readonly UserServices userServices;
+        private readonly ITrainerServices trainerServices;
+        private readonly IDancerServices dancerServices;
+        private readonly IUserServices userServices;
 
         public AuthenServices(UserManager<ApplicationUser> _userManager,
                             RoleManager<IdentityRole> _roleManager,
                               IConfiguration _configuration,
-                          TrainerServices trainerServices)
-        {
+                          ITrainerServices _trainerServices, IDancerServices _dancerServices,
+                                                         IUserServices _userServices)
+        { 
               userManager = _userManager;
               roleManager = _roleManager;
               configuration = _configuration;
-              trainerServices = trainerServices;
+              trainerServices = _trainerServices;
+               dancerServices = _dancerServices;
+                userServices = _userServices;
         }
 
         public async Task<LoginResponseModel> Login(LoginModel model)
@@ -93,7 +96,8 @@ var user = await userManager.FindByEmailAsync(model.Email);
 
         public async Task<IdentityResult> RegisterDancer(DancerDTO model)
         {
-var userexist = await userManager.FindByEmailAsync(model.Email);
+           
+            var userexist = await userManager.FindByEmailAsync(model.Email);
             if (userexist != null)
             {
                 return IdentityResult.Failed(new IdentityError { Description = "Email already exists" });
@@ -108,9 +112,24 @@ var userexist = await userManager.FindByEmailAsync(model.Email);
             };
 
             var result = await userManager.CreateAsync(user, model.Password);
+
             if (result.Succeeded)
             {
                 await userManager.AddToRoleAsync(user, "Dancer");
+            }
+            var Dancerdto = new DancerDTO
+            { 
+            FullName =model.FullName,
+            PhoneNumber = model.PhoneNumber,
+           Email = model.Email,
+           Age = model.Age,
+           Style = model.Style
+            };
+            var dancer = await dancerServices.CreateDancer(Dancerdto);
+            if (dancer == null)
+            {
+                return IdentityResult.Failed(new IdentityError { Description = "Failed to create dancer" });
+
             }
 
             return result;
@@ -137,7 +156,22 @@ var userexist = await userManager.FindByEmailAsync(model.Email);
             {
                 await userManager.AddToRoleAsync(newUser, "Trainer");
             }
-
+            var trainerdto = new TrainerDto
+            {
+                FullName = model.FullName,
+                PhoneNumber = model.PhoneNumber,
+                Email = model.Email,
+                Specialization = model.Specialization,
+                Qualifications = model.Qualifications,
+                LicenseNumber = model.LicenseNumber
+            };
+           
+            var trainerResult = await trainerServices.CreateTrainerAsync(trainerdto);
+            if (trainerResult == null)
+            {
+                return IdentityResult.Failed(new IdentityError { Description = "Failed to create trainer" });
+            }
+          
             return result;
 
         }

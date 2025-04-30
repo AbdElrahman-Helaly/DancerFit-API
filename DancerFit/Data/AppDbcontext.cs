@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace DancerFit
+namespace DancerFit.Data
 {
     public class AppDbcontext : IdentityDbContext
     {

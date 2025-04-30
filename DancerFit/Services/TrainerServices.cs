@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using DancerFit.Data;
 using DancerFit.DTOS;
 using DancerFit.Models;
 using Microsoft.AspNetCore.Identity;
@@ -10,18 +11,17 @@ namespace DancerFit.Services
     public class TrainerServices : ITrainerServices
     {
         private readonly AppDbcontext appDbcontext;
-        private readonly UserManager<IdentityUser> userManager;
+        private readonly UserManager<ApplicationUser> userManager;
         private readonly IMapper mapper;
 
 
         public TrainerServices(AppDbcontext _appDbcontext,
-                               UserManager<IdentityUser> _userManager,
+                               UserManager<ApplicationUser> _userManager,
                                 IMapper _mapper
 )
         {
             appDbcontext = _appDbcontext;
             userManager = _userManager;
-            logService = _logService;
             mapper=_mapper;
         }
 

@@ -1,6 +1,6 @@
-﻿namespace DancerFit.Models
+﻿namespace DancerFit.DTOS
 {
-    public class DanceClass
+    public class DanceDTO
     {
         public int Id { get; set; }
         public string Title { get; set; }
@@ -8,11 +8,5 @@
         public int DurationMinutes { get; set; }
         public string Level { get; set; } // Beginner / Intermediate / Advanced
         public DateTime CreatedAt { get; set; }
-
-        public int CategoryId { get; set; }
-        public Category Category { get; set; }
-
-        public int TrainerId { get; set; }
-        public Trainer Trainer { get; set; }
     }
 }

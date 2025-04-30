@@ -11,7 +11,7 @@ namespace DancerFit.profile
             CreateMap<ApplicationUser, UserRegisterDto>().ReverseMap();
             CreateMap<Trainer, TrainerDto>();
             CreateMap<TrainerDto, Trainer>().ReverseMap();
-            CreateMap<DanceClass, DanceClassCreateDTO>();
+            CreateMap<Dancer, DancerDTO>();
             CreateMap<Category, CategoryDTO>();
         }
     }

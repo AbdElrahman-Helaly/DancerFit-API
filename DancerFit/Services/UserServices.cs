@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using DancerFit.Data;
 using DancerFit.DTOS;
 using DancerFit.Models;
 using Microsoft.AspNetCore.Identity;

@@ -1,53 +1,46 @@
-﻿using DancerFit;
+﻿using DancerFit.Data;
+using DancerFit.Models;
 using DancerFit.profile;
 using DancerFit.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using System;
 using System.Text;
 
-internal class Program
+var builder = WebApplication.CreateBuilder(args);
+
+// Add services to the container.
+builder.Services.AddControllers();
+
+// Database Context (ensure it inherits from IdentityDbContext<ApplicationUser>)
+builder.Services.AddDbContext<AppDbcontext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Identity Configuration - USE YOUR CUSTOM USER CLASS HERE
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>() // Changed from IdentityUser
+    .AddEntityFrameworkStores<AppDbcontext>()
+    .AddDefaultTokenProviders();
+
+// AutoMapper
+builder.Services.AddAutoMapper(typeof(MappingProfile));
+
+// Custom Services
+builder.Services.AddScoped<ITrainerServices, TrainerServices>();
+builder.Services.AddScoped<IDancerServices, DancerServices>();
+builder.Services.AddScoped<IUserServices, UserServices>();
+builder.Services.AddScoped<IAuthenServices, AuthenServices>();
+
+// Swagger
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+// JWT Authentication (single configuration)
+builder.Services.AddAuthentication(options =>
 {
-    private static void Main(string[] args)
-    {
-        var builder = WebApplication.CreateBuilder(args);
-
-        // Add services to the container.
-        builder.Services.AddControllers();
-
-        // Database Context
-        builder.Services.AddDbContext<AppDbcontext>(options =>
-            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-        // Identity Configuration (مرة واحدة فقط)
-        builder.Services.AddIdentity<IdentityUser, IdentityRole>()
-            .AddEntityFrameworkStores<AppDbcontext>()
-            .AddDefaultTokenProviders();
-
-
-        // Authentication
-        builder.Services.AddAuthentication();
-
-        // AutoMapper
-        builder.Services.AddAutoMapper(typeof(MappingProfile));
-
-        // Custom Services
-        builder.Services.AddScoped<ITrainerServices, TrainerServices>();
-        builder.Services.AddScoped<IUserServices, UserServices>();
-        builder.Services.AddScoped<IDancerServices, DancerServices>();
-
-
-        // Swagger
-        builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen();
-
-        builder.Services.AddAuthentication(options =>
-        {
-            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-        })
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
 .AddJwtBearer(options =>
 {
     options.TokenValidationParameters = new TokenValidationParameters
@@ -62,23 +55,17 @@ internal class Program
     };
 });
 
+var app = builder.Build();
 
-        var app = builder.Build();
-
-        // Configure the HTTP request pipeline.
-        if (app.Environment.IsDevelopment())
-        {
-            app.UseSwagger();
-            app.UseSwaggerUI();
-        }
-
-        app.UseHttpsRedirection();
-
-        app.UseAuthentication();
-        app.UseAuthorization();
-
-        app.MapControllers();
-
-        app.Run();
-    }
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
+
+app.UseHttpsRedirection();
+app.UseAuthentication();
+app.UseAuthorization();
+app.MapControllers();
+app.Run();
