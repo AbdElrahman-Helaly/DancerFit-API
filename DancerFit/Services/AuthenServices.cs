@@ -33,7 +33,7 @@ namespace DancerFit.Services
 
         public async Task<LoginResponseModel> Login(LoginModel model)
         {
-var user = await userManager.FindByEmailAsync(model.Email);
+            var user = await userManager.FindByEmailAsync(model.Email);
             if (user == null)
             {
                 return null;
@@ -192,9 +192,13 @@ var user = await userManager.FindByEmailAsync(model.Email);
             };
 
             var result = await userManager.CreateAsync(newUser, model.Password);
+
+
             if (result.Succeeded)
             {
-                await userManager.AddToRoleAsync(newUser, "User");
+                var rolesToAdd = model.Roles != null && model.Roles.Any() ? model.Roles : new List<string> { UserRoles.User };
+
+                await userManager.AddToRolesAsync(newUser, rolesToAdd);
             }
 
             return result;

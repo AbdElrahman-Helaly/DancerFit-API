@@ -26,6 +26,7 @@ namespace DancerFit.Controllers
             }
 
             var response = await authenServices.Login(model);
+            
             if (response == null)
             {
                 return Unauthorized("Invalid login attempt");

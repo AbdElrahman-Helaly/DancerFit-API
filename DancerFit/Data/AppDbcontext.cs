@@ -10,7 +10,7 @@ namespace DancerFit.Data
         {
         }
 
-        public DbSet<Models.ApplicationUser> Users { get; set; }
+       /// public DbSet<Models.ApplicationUser> Users { get; set; }
         public DbSet<Models.Package> Packages { get; set; }
         public DbSet<Models.Category> Categories { get; set; }
         public DbSet<Models.Trainer> Trainers { get; set; }

@@ -1,4 +1,5 @@
 ﻿using DancerFit.DTOS;
+using DancerFit.Models;
 using DancerFit.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -51,7 +52,7 @@ namespace DancerFit.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = UserRoles.Admin)]
         public async Task<IActionResult> CreateTrainer([FromBody] TrainerDto trainerDto)
         {
             if (trainerDto == null)
@@ -75,7 +76,7 @@ namespace DancerFit.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = UserRoles.Admin)]
         public async Task<IActionResult> UpdateTrainer(int id, [FromBody] TrainerDto trainerDto)
         {
             if (trainerDto == null)
@@ -99,7 +100,7 @@ namespace DancerFit.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(UserRoles.Admin)]
         public async Task<IActionResult> DeleteDoctor(int id)
         {
             var result = await trainerServices.DeleteTrainerAsync(id);

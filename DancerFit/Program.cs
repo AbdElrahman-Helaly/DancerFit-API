@@ -10,15 +10,12 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddControllers();
 
-// Database Context (ensure it inherits from IdentityDbContext<ApplicationUser>)
 builder.Services.AddDbContext<AppDbcontext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Identity Configuration - USE YOUR CUSTOM USER CLASS HERE
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>() // Changed from IdentityUser
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<AppDbcontext>()
     .AddDefaultTokenProviders();
 

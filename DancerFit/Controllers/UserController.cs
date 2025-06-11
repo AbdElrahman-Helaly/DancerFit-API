@@ -12,29 +12,56 @@ namespace DancerFit.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private readonly IUserServices userServices;
+        private readonly IUserServices _userServices;
       
-        public UserController(IUserServices _userServices)
+        public UserController(IUserServices userServices)
         {
-          userServices = _userServices;
+          _userServices = userServices;
         }
         [HttpGet]
-        [Route("GetUserById/{id}")]
-        public async Task<IActionResult> GetUserById(string id)
+        public async Task<IActionResult> GetAll()
         {
-            if (string.IsNullOrEmpty(id))
-            {
-                return BadRequest("Invalid user ID");
-            }
+            var users = await _userServices.GetAllUsersAsync();
+            return Ok(users);
+        }
 
-            var user = await userServices.GetUserByIdAsync(id);
-            if (user == null)
-            {
-                return NotFound("User not found");
-            }
-
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(string id)
+        {
+            var user = await _userServices.GetUserByIdAsync(id);
             return Ok(user);
         }
+
+        [HttpGet("by-email")]
+        public async Task<IActionResult> GetByEmail([FromQuery] string email)
+        {
+            var user = await _userServices.GetUserByEmailAsync(email);
+            return Ok(user);
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> Update([FromBody] UserDTO userDto)
+        {
+            var result = await _userServices.UpdateUserAsync(userDto);
+            if (!result)
+                return BadRequest("Update failed");
+
+            return Ok("User updated successfully");
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(string id)
+        {
+            var result = await _userServices.DeleteUserAsync(id);
+            if (!result)
+                return BadRequest("Delete failed");
+
+            return Ok("User deleted successfully");
+        }
+    
+
+       
+       
 
         [HttpPost("Login")]
         public async Task<IActionResult> Login([FromBody] UserLoginDto loginDto)
@@ -44,7 +71,7 @@ namespace DancerFit.Controllers
                 return BadRequest(ModelState);
             }
 
-            var token = await userServices.LoginAsync(loginDto);
+            var token = await _userServices.LoginAsync(loginDto);
             if (string.IsNullOrEmpty(token))
             {
                 return Unauthorized("Invalid login attempt");
@@ -61,7 +88,7 @@ namespace DancerFit.Controllers
                 return BadRequest(ModelState);
             }
 
-            var result = await userServices.RegisterAsync(registerDto);
+            var result = await _userServices.RegisterAsync(registerDto);
         
 
 

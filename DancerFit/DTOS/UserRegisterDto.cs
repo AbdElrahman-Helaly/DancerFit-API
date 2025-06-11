@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using DancerFit.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace DancerFit.DTOS
 {
@@ -14,5 +15,10 @@ namespace DancerFit.DTOS
         [Required]
         [MinLength(6)]
         public string Password { get; set; }
+
+
+        [Required]
+        public List<string> Roles { get; set; }
+
     }
 }
